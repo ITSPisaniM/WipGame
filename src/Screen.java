@@ -86,7 +86,7 @@ public class Screen {
 				lineHeight = Math.abs((int) (height / perpWallDist));
 			else
 				lineHeight = height;
-			// Calcola il più basso è il più alto pixel da riempire
+			// Calcola il piï¿½ basso ï¿½ il piï¿½ alto pixel da riempire
 			int drawStart = -lineHeight / 2 + height / 2;
 			if (drawStart < 0)
 				drawStart = 0;
@@ -96,7 +96,7 @@ public class Screen {
 			// aggiungi texture
 			int texNum = map[mapX][mapY] - 1;
 			double wallX;// posizione esatta colpita
-			if (side == 1) {// se è in muro sull'y
+			if (side == 1) {// se ï¿½ in muro sull'y
 				wallX = (camera.xPos + ((mapY - camera.yPos + (1 - stepY) / 2) / rayDirY) * rayDirX);
 			} else {// muro sulla x
 				wallX = (camera.yPos + ((mapX - camera.xPos + (1 - stepX) / 2) / rayDirX) * rayDirY);
