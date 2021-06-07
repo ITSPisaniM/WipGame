@@ -1,18 +1,22 @@
-import java.util.ArrayList;
+package org.wipgame;
+
+import java.util.List;
 import java.awt.Color;
+import java.io.Serializable;
 
-public class Screen {
-	public int[][] map;
-	public int mapWidth, mapHeight, width, height;
-	public ArrayList<Texture> textures;
+public class Screen implements Serializable {
+	private static final long serialVersionUID = 2705172041950251807L;
 
-	public Screen(int[][] m, int mapW, int mapH, ArrayList<Texture> tex, int w, int h) {
-		map = m;
-		mapWidth = mapW;
-		mapHeight = mapH;
-		textures = tex;
-		width = w;
-		height = h;
+	private int[][] map;
+	private int width;
+	private int height;
+	private List<Texture> textures;
+
+	public Screen(int[][] map, List<Texture> textures, int width, int height) {
+		this.map = map;
+		this.textures = textures;
+		this.width = width;
+		this.height = height;
 	}
 
 	public int[] update(Camera camera, int[] pixels) {
@@ -24,14 +28,13 @@ public class Screen {
 			if (pixels[i] != Color.gray.getRGB())
 				pixels[i] = Color.gray.getRGB();
 		}
-
 		for (int x = 0; x < width; x = x + 1) {
 			double cameraX = 2 * x / (double) (width) - 1;
-			double rayDirX = camera.xDir + camera.xPlane * cameraX;
-			double rayDirY = camera.yDir + camera.yPlane * cameraX;
+			double rayDirX = camera.getXDir() + camera.getXPlane() * cameraX;
+			double rayDirY = camera.getYDir() + camera.getYPlane() * cameraX;
 			// Posizione mappa
-			int mapX = (int) camera.xPos;
-			int mapY = (int) camera.yPos;
+			int mapX = (int) camera.getXPos();
+			int mapY = (int) camera.getYPos();
 			// Lunghezza del raggio al lato x o y
 			double sideDistX;
 			double sideDistY;
@@ -40,23 +43,24 @@ public class Screen {
 			double deltaDistY = Math.sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY));
 			double perpWallDist;
 			// Direzione da andare per x e y
-			int stepX, stepY;
+			int stepX;
+			int stepY;
 			boolean hit = false;// muro colpito
 			int side = 0;// muro colpito in verticale o diagonale
 			// trovare la direzione dei passi
 			if (rayDirX < 0) {
 				stepX = -1;
-				sideDistX = (camera.xPos - mapX) * deltaDistX;
+				sideDistX = (camera.getXPos() - mapX) * deltaDistX;
 			} else {
 				stepX = 1;
-				sideDistX = (mapX + 1.0 - camera.xPos) * deltaDistX;
+				sideDistX = (mapX + 1.0 - camera.getXPos()) * deltaDistX;
 			}
 			if (rayDirY < 0) {
 				stepY = -1;
-				sideDistY = (camera.yPos - mapY) * deltaDistY;
+				sideDistY = (camera.getYPos() - mapY) * deltaDistY;
 			} else {
 				stepY = 1;
-				sideDistY = (mapY + 1.0 - camera.yPos) * deltaDistY;
+				sideDistY = (mapY + 1.0 - camera.getYPos()) * deltaDistY;
 			}
 			// Loop per trovare dove il raggio colpisce il muro
 			while (!hit) {
@@ -71,15 +75,14 @@ public class Screen {
 					side = 1;
 				}
 				// Controlla se il raggio colpisce un muro
-				// System.out.println(mapX + ", " + mapY + ", " + map[mapX][mapY]);
 				if (map[mapX][mapY] > 0)
 					hit = true;
 			}
 			// Calcola la distanza dal punto di impatto
 			if (side == 0)
-				perpWallDist = Math.abs((mapX - camera.xPos + (1 - stepX) / 2) / rayDirX);
+				perpWallDist = Math.abs((mapX - camera.getXPos() + (1 - (double) stepX) / 2) / rayDirX);
 			else
-				perpWallDist = Math.abs((mapY - camera.yPos + (1 - stepY) / 2) / rayDirY);
+				perpWallDist = Math.abs((mapY - camera.getYPos() + (1 - (double) stepY) / 2) / rayDirY);
 			// Calcola l'altezza del muro colpito
 			int lineHeight;
 			if (perpWallDist > 0)
@@ -97,28 +100,29 @@ public class Screen {
 			int texNum = map[mapX][mapY] - 1;
 			double wallX;// posizione esatta colpita
 			if (side == 1) {// se � in muro sull'y
-				wallX = (camera.xPos + ((mapY - camera.yPos + (1 - stepY) / 2) / rayDirY) * rayDirX);
+				wallX = (camera.getXPos() + ((mapY - camera.getYPos() + (1 - (double) stepY) / 2) / rayDirY) * rayDirX);
 			} else {// muro sulla x
-				wallX = (camera.yPos + ((mapX - camera.xPos + (1 - stepX) / 2) / rayDirX) * rayDirY);
+				wallX = (camera.getYPos() + ((mapX - camera.getXPos() + (1 - (double) stepX) / 2) / rayDirX) * rayDirY);
 			}
 			wallX -= Math.floor(wallX);
 			// cordinate x della texture
-			int texX = (int) (wallX * (textures.get(texNum).SIZE));
+			int texX = (int) (wallX * (textures.get(texNum).getSize()));
 			if (side == 0 && rayDirX > 0)
-				texX = textures.get(texNum).SIZE - texX - 1;
+				texX = textures.get(texNum).getSize() - texX - 1;
 			if (side == 1 && rayDirY < 0)
-				texX = textures.get(texNum).SIZE - texX - 1;
+				texX = textures.get(texNum).getSize() - texX - 1;
 			// cordinate y della texture
 			for (int y = drawStart; y < drawEnd; y++) {
 				int texY = (((y * 2 - height + lineHeight) << 6) / lineHeight) / 2;
 				int color;
 				if (side == 0)
-					color = textures.get(texNum).pixels[texX + (texY * textures.get(texNum).SIZE)];
+					color = textures.get(texNum).getPixels()[texX + (texY * textures.get(texNum).getSize())];
 				else
-					color = (textures.get(texNum).pixels[texX + (texY * textures.get(texNum).SIZE)] >> 1) & 8355711;// Make
-																													// y
-																													// sides
-																													// darker
+					color = (textures.get(texNum).getPixels()[texX + (texY * textures.get(texNum).getSize())] >> 1)
+							& 8355711;// Make
+				// y
+				// sides
+				// darker
 				pixels[x + y * (width)] = color;
 			}
 		}

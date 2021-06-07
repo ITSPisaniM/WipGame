@@ -1,24 +1,26 @@
+package org.wipgame;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.JFrame;
 
 public class Game extends JFrame implements Runnable {
 
 	private static final long serialVersionUID = 1L;
-	public int mapWidth = 15;
-	public int mapHeight = 15;
-	private Thread thread;
+	private transient Thread thread;
 	private boolean running;
-	private BufferedImage image;
-	public int[] pixels;
-	public ArrayList<Texture> textures;
-	public Camera camera;
-	public Screen screen;
-	public static int[][] map = { { 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2 },
+	private transient BufferedImage image;
+	private int[] pixels;
+	private List<Texture> textures;
+	private Camera camera;
+	private Screen screen;
+	private static int[][] map = { { 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2 },
 			{ 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2 }, { 1, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 0, 0, 2 },
 			{ 1, 0, 3, 0, 0, 0, 3, 0, 2, 0, 0, 0, 0, 0, 2 }, { 1, 0, 3, 0, 0, 0, 3, 0, 2, 2, 2, 0, 2, 2, 2 },
 			{ 1, 0, 3, 0, 0, 0, 3, 0, 2, 0, 0, 0, 0, 0, 2 }, { 1, 0, 3, 3, 0, 3, 3, 0, 2, 0, 0, 0, 0, 0, 2 },
@@ -31,18 +33,18 @@ public class Game extends JFrame implements Runnable {
 		thread = new Thread(this);
 		image = new BufferedImage(640, 480, BufferedImage.TYPE_INT_RGB);
 		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-		textures = new ArrayList<Texture>();
+		textures = new ArrayList<>();
 		textures.add(Texture.wood);
 		textures.add(Texture.brick);
 		textures.add(Texture.bluestone);
 		textures.add(Texture.stone);
 		camera = new Camera(4.5, 4.5, 1, 0, 0, -.66);
-		screen = new Screen(map, mapWidth, mapHeight, textures, 640, 480);
+		screen = new Screen(map, textures, 640, 480);
 		addKeyListener(camera);
 		setSize(640, 480);
 		setResizable(false);
 		setTitle("3D Engine");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setBackground(Color.black);
 		setLocationRelativeTo(null);
 		setVisible(true);
@@ -59,7 +61,7 @@ public class Game extends JFrame implements Runnable {
 		try {
 			thread.join();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			Thread.currentThread().interrupt();
 		}
 	}
 

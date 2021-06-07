@@ -1,19 +1,55 @@
+package org.wipgame;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.Serializable;
 
-public class Camera implements KeyListener {
-	public double xPos, yPos, xDir, yDir, xPlane, yPlane;
-	public boolean left, right, forward, back;
-	public final double MOVE_SPEED = .08;
-	public final double ROTATION_SPEED = .045;
+public class Camera implements KeyListener, Serializable {
+	private static final long serialVersionUID = 2405172041950251807L;
+	private double xPos;
+	private double yPos;
+	private double xDir;
+	private double yDir;
+	private double xPlane;
+	private double yPlane;
+	private boolean left;
+	private boolean right;
+	private boolean forward;
+	private boolean back;
+	public static final double MOVE_SPEED = .08;
+	public static final double ROTATION_SPEED = .045;
 
-	public Camera(double x, double y, double xd, double yd, double xp, double yp) {
-		xPos = x;
-		yPos = y;
-		xDir = xd;
-		yDir = yd;
-		xPlane = xp;
-		yPlane = yp;
+	public double getXPos() {
+		return this.xPos;
+	}
+
+	public double getYPos() {
+		return this.yPos;
+	}
+
+	public double getXDir() {
+		return this.xDir;
+	}
+
+	public double getYDir() {
+		return this.yDir;
+	}
+
+	public double getXPlane() {
+		return this.xPlane;
+	}
+
+	public double getYPlane() {
+		return this.yPlane;
+	}
+
+	public Camera(double xPos, double yPos, double xDir, double yDir, double xPlane, double yPlane) {
+		this.xPos = xPos;
+		this.yPos = yPos;
+		this.xDir = xDir;
+		this.yDir = yDir;
+		this.xPlane = xPlane;
+		this.yPlane = yPlane;
 	}
 
 	public void keyPressed(KeyEvent key) {
